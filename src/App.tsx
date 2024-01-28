@@ -1,24 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import { TodoItem } from './types/todoItem';
 
 function App() {
+
+  const [todoItems, setTodoItems] = useState<TodoItem[]>();
+
+  useEffect(() => {
+    //happens on page load
+    console.log("Hey I loaded up")
+
+    if(!todoItems){
+    fetch('http://localhost:8080/api/todoItems')
+      .then((response) => response.json())
+      .then((data: TodoItem[]) => {console.log("Todo items list: ", data)
+        setTodoItems(data);
+      });
+    }
+  }, [todoItems]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {todoItems 
+      ? todoItems.map((todoItem: any) => {
+        return (
+        <div key={todoItem.id}>
+          <input type='checkbox' checked={todoItem.isDone} /> {" "}
+          <span>{todoItem.task}</span>
+        </div>
+        )
+      }) 
+      : 'loading data ...'}
     </div>
   );
 }
